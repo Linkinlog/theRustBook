@@ -1,7 +1,6 @@
 # Chapter 4
 
 <!--toc:start-->
-
 - [Chapter 4](#chapter-4)
   - [01 - Ownership](#01-ownership)
     - [What is Ownership?](#what-is-ownership)
@@ -10,8 +9,12 @@
     - [Boxes Live in the Heap](#boxes-live-in-the-heap)
     - [A Box's Owner Manages Deallocation](#a-boxs-owner-manages-deallocation)
     - [Collections Use Boxes](#collections-use-boxes)
-  - [02 - References and Borrowing](#02-references-and-borrowing) - [References are Non-Owning Pointers](#references-are-non-owning-pointers) - [Dereferencing a Pointer Accesses Its Data](#dereferencing-a-pointer-accesses-its-data) - [Rust Avoids Simultaneous Aliasing and Mutation](#rust-avoids-simultaneous-aliasing-and-mutation) - [References Change Permissions on Paths](#references-change-permissions-on-paths)
-  <!--toc:end-->
+  - [02 - References and Borrowing](#02-references-and-borrowing)
+    - [References are Non-Owning Pointers](#references-are-non-owning-pointers)
+    - [Dereferencing a Pointer Accesses Its Data](#dereferencing-a-pointer-accesses-its-data)
+    - [Rust Avoids Simultaneous Aliasing and Mutation](#rust-avoids-simultaneous-aliasing-and-mutation)
+    - [References Change Permissions on Paths](#references-change-permissions-on-paths)
+<!--toc:end-->
 
 ## 01 - Ownership
 
