@@ -157,3 +157,25 @@ This is not used very much though, as Rust references and dereferences implicitl
 - Default is R/O
 - `mut` adds W
 - References can temporarily remove these permissions
+
+## 03 - Fixing Ownership Errors
+
+ A common ownership issue can occcur whenever we make some new data within a function and return a reference to the data. Ex:
+ ```rust
+ fn return_a_string() -> &String {
+     let a = String::from("Hello World");
+     &a
+ }
+ ```
+
+To solve this we have some options:
+1. Return the string itself, moving ownership. 
+```rust
+fn ex_one() -> String {
+    let a = String::from("Hello World");
+    a
+}
+```
+2. Return a string literal if we never intend to change the string's value. 
+3. Defer lifetime-checking to the runtime by using garbage collection, for example we can use a [reference-counted pointer](https://doc.rust-lang.org/std/rc/index.html). 
+4. Provide a "slot" where we take in a mutable reference to a string and then modify it within our function, this makes it, so the memory needs to be taken care of before/during the function call instead of within the function. 
