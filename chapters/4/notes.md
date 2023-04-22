@@ -1,6 +1,7 @@
 # Chapter 4
 
 <!--toc:start-->
+
 - [Chapter 4](#chapter-4)
   - [01 - Ownership](#01-ownership)
     - [What is Ownership?](#what-is-ownership)
@@ -14,7 +15,8 @@
     - [Dereferencing a Pointer Accesses Its Data](#dereferencing-a-pointer-accesses-its-data)
     - [Rust Avoids Simultaneous Aliasing and Mutation](#rust-avoids-simultaneous-aliasing-and-mutation)
     - [References Change Permissions on Paths](#references-change-permissions-on-paths)
-<!--toc:end-->
+  - [03 - Fixing Ownership Errors](#03-fixing-ownership-errors) - [Fixing an Unsafe Program: Returning a Reference to the Stack](#fixing-an-unsafe-program-returning-a-reference-to-the-stack) - [Fixing an Unsafe Program: Not Enough Permissions](#fixing-an-unsafe-program-not-enough-permissions) - [Fixing an Unsafe Program: Aliasing and Mutating a Data Structure](#fixing-an-unsafe-program-aliasing-and-mutating-a-data-structure)
+  <!--toc:end-->
 
 ## 01 - Ownership
 
@@ -160,22 +162,69 @@ This is not used very much though, as Rust references and dereferences implicitl
 
 ## 03 - Fixing Ownership Errors
 
- A common ownership issue can occcur whenever we make some new data within a function and return a reference to the data. Ex:
- ```rust
- fn return_a_string() -> &String {
-     let a = String::from("Hello World");
-     &a
- }
- ```
+### Fixing an Unsafe Program: Returning a Reference to the Stack
+
+A common ownership issue can occur whenever we make some new data within a function and return a reference to the data. Ex:
+
+```rust
+fn return_a_string() -> &String {
+    let a = String::from("Hello World");
+    &a
+}
+```
 
 To solve this we have some options:
-1. Return the string itself, moving ownership. 
+
+1. Return the string itself, moving ownership.
+
 ```rust
 fn ex_one() -> String {
     let a = String::from("Hello World");
     a
 }
 ```
-2. Return a string literal if we never intend to change the string's value. 
-3. Defer lifetime-checking to the runtime by using garbage collection, for example we can use a [reference-counted pointer](https://doc.rust-lang.org/std/rc/index.html). 
-4. Provide a "slot" where we take in a mutable reference to a string and then modify it within our function, this makes it, so the memory needs to be taken care of before/during the function call instead of within the function. 
+
+2. Return a string literal if we never intend to change the string's value.
+
+```rust
+fn ex_two() -> &`static str {
+    "Hello World"
+}
+```
+
+3. Defer lifetime-checking to the runtime by using garbage collection, for example we can use a [reference-counted pointer](https://doc.rust-lang.org/std/rc/index.html).
+
+```rust
+use std::rc::Rc;
+fn ex_tree() -> Rc<String> {
+    let s = Rc::new(String::from("Hello World"));
+    Rc::clone(&s)
+}
+```
+
+4. Provide a "slot" where we take in a mutable reference to a string and then modify it within our function, this makes it, so the memory needs to be taken care of before/during the function call instead of within the function.
+
+```rust
+fn ex_for(output: &mut String) {
+    output.replace_range(.., "Hello World");
+}
+//...
+let mut s = String::new();
+ex_for(&mut s);
+```
+
+### Fixing an Unsafe Program: Not Enough Permissions
+
+> There are many possible fixes which vary in how much memory they use. One possibility is to clone the input `name`:
+
+```rust
+fn stringify_name_with_title(name: &Vec<String>) -> String {
+    let mut full = name.join(" ");
+    full.push(" Esq.");
+    full
+}
+```
+
+### Fixing an Unsafe Program: Aliasing and Mutating a Data Structure
+
+Always be aware of the mutability of return types, if we make a variable and assign it the output of a method, we may lose mutability if the return type isn't mutable, see: [std::iter](https://doc.rust-lang.org/std/iter/#the-three-forms-of-iteration) as an example
