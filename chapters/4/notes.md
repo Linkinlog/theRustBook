@@ -227,4 +227,37 @@ fn stringify_name_with_title(name: &Vec<String>) -> String {
 
 ### Fixing an Unsafe Program: Aliasing and Mutating a Data Structure
 
-Always be aware of the mutability of return types, if we make a variable and assign it the output of a method, we may lose mutability if the return type isn't mutable, see: [std::iter](https://doc.rust-lang.org/std/iter/#the-three-forms-of-iteration) as an example
+- Always be aware of the mutability of return types, if we make a variable and assign it the output of a method, we may lose mutability if the return type isn't mutable, see: [std::iter](https://doc.rust-lang.org/std/iter/#the-three-forms-of-iteration)/`iter_mut()` as an example.
+
+Another issue can occur if we alias a mutable reference in an immutable way and then use the mutable variable, this could cause the immutable variable to refer to heap data that has been deallocated. Ex:
+
+```rust
+fn add_big_strings(dst: &mut Vec<String>, src: &[String]) {
+    let largest: &String =
+      dst.iter().max_by_key(|s| s.len()).unwrap(); // We borrow `dst` here but,
+                                                   // we borrow it immutably.
+    for s in src {
+        if s.len() > largest.len() {
+            dst.push(s.clone()); // This could end up deallocating
+                                 // the memory that `largest` refers to.
+        }
+    }
+}
+```
+
+We can fix it by just using the length of the string like such:
+
+```rust
+fn add_big_strings(dst: &mut Vec<String>, src: &[String]) {
+    // Instead of using a reference and getting the length later,
+    // we just get the len at the beginning.
+    let largest_len: usize = dst.iter().max_by_key(|s| s.len()).unwrap().len();
+    for s in src {
+        if s.len() > largest_len {
+            dst.push(s.clone());
+        }
+    }
+}
+```
+
+This fixes our issue because there is no reference to heap data that could have been deallocated.
