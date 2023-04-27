@@ -78,3 +78,33 @@ fn main() {
 ## 03
 
 ### Method Syntax
+
+To use method syntax we can modify the `get_area()` function to be inside a struct, enum, or trait object. Like so:
+
+```rust
+// Method syntax
+impl Rectangle {
+    fn area(&self) -> usize {
+        self.width * self.length
+    }
+}
+```
+
+### Associated Functions
+
+We can think of associated functions like static methods:
+
+```rust
+impl Rectangle {
+    fn square(size: u32) -> Self {
+        Self {
+            width: size,
+            length: size,
+        }
+    }
+}
+
+//...
+
+Rectangle::square(4);
+```
