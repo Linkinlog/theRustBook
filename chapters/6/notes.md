@@ -150,3 +150,16 @@ match &opt {
 println!("{:?}", opt);
 }
 ```
+
+## 03
+
+### Concise Control Flow with if let
+
+We can use `if let` statements to conditionally set variables in a way that is similar to match yet in a less verbose way, this also allows us to not have to worry about match statements requirement to handle every scenario. Consider the following:
+
+```rust
+let an_int = 5;
+if let 5 = an_int {
+    println!("Its a {}, wow!", an_int);
+}
+```
